@@ -1,0 +1,156 @@
+/*===========================
+Made By AwayTitan098
+Discord - AwayTitan098#1425
+==============================
+Upgraded Version Of Trucker Job
+==================================[Features]==================================
+Trucker JobUpdated To Depend On Trailer
+Note - You Can Create Ur Vehicle By Urself
+[Working Truck Vehicle ID - 403]
+[Working Trailers ID - 435, 450, 584, 591]
+If U Had Already Loadtruck CMD Then DM Me I Will Teach U Else Follow And Enjoy
+===============================================================================
+*/
+//[CMD]
+Search CMD:loadtruck
+
+CMD:haul(playerid, params[])
+{
+	new vehicleid = GetPlayerVehicleID(playerid);
+
+	if(!PlayerHasJob(playerid, JOB_COURIER))
+	{
+	    return SCM(playerid, COLOR_SYNTAX, "[ERORR]: You can't use this command as you are not a Trucker.");
+	}
+	if(GetVehicleModel(GetPlayerVehicleID(playerid)) != 403 && GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
+	{
+		return SCM(playerid, COLOR_SYNTAX, "[ERORR]: You Are Not In The Trucker Job Vehicle");
+	}
+	if(!IsPlayerInRangeOfPoint(playerid, 8.0, 2460.9790,-2119.2590,13.5530))
+	{
+	    return SCM(playerid, COLOR_SYNTAX, "[ERROR]: You Are Not At The Loading Dock.");
+	}
+	if(PlayerInfo[playerid][pShipment] > 0)
+	{
+	    return SCM(playerid, COLOR_SYNTAX, "[ERROR]: You Have A Shipment Loaded Already. You Need To Deliver It First.");
+	}
+	if(PlayerInfo[playerid][pCP] != CHECKPOINT_NONE)
+	{
+	    return SCM(playerid, COLOR_SYNTAX, "[ERROR]: You Must Cancel Your active Checkpoint First. /cancelcp To Cancel It.");
+	}
+	if(!IsTrailerAttachedToVehicle(vehicleid))
+	{
+		return SCM(playerid, COLOR_SYNTAX, "You Need Trailer Attached To Your Truck To Proceed");
+	}
+
+	SCM(playerid, COLOR_YELLOW, "Go To The Checkpoint To Finish Haul");
+
+	PlayerInfo[playerid][pShipment] = 1;
+	PlayerInfo[playerid][pCP] = CHECKPOINT_TRUCKER;
+	SetPlayerCheckpoint(playerid, 2202.0178, -2247.8555, 13.5469, 6.0);
+
+	return 1;
+}
+//[CHECKPOINTS]
+Search OnPlayerConnect And Paste This Up From It
+
+public OnPlayerEnterCheckpoint(playerid)
+{
+	switch(PlayerInfo[playerid][pCP])
+	{
+		case CHECKPOINT_TRUCKER:
+		{
+			new amount = 50 + random(50), petrolv = 20059 + random(596), foodv = 10189 + random(152), elecv = 16890 + random(289), dirtv = 5789 + random(78), paperv = 2879 + random(21);
+			new vehicleid = GetPlayerVehicleID(playerid), cargo[32];
+			if(IsTrailerAttachedToVehicle(vehicleid))
+			{
+				new trailerid = GetVehicleTrailer(vehicleid);
+				switch(GetVehicleModel(trailerid))
+				{
+					case 435:
+					{
+						cargo = "Tonnes Of Food And Drinks";
+
+						SM(playerid, COLOR_YELLOW, "You Moved %i %s And Earned %i", amount, cargo, foodv);
+
+						PlayerInfo[playerid][pShipment] = 0;
+						PlayerInfo[playerid][pCP] = CHECKPOINT_NONE;
+
+						GivePlayerCash(playerid, foodv);
+
+						DisablePlayerCheckpoint(playerid);
+					}
+					case 450:
+					{
+						cargo = "Tonnes Of Dirts";
+
+						SM(playerid, COLOR_YELLOW, "You Moved %i %s And Earned %i", amount, cargo, dirtv);
+
+						PlayerInfo[playerid][pShipment] = 0;
+						PlayerInfo[playerid][pCP] = CHECKPOINT_NONE;
+
+						GivePlayerCash(playerid, dirtv);
+
+						DisablePlayerCheckpoint(playerid);
+					}
+					case 584:
+					{
+						cargo = "Thousands Gallons Of Petroleum";
+
+						SM(playerid, COLOR_YELLOW, "You Moved %i %s And Earned %i", amount, cargo, petrolv);
+
+						PlayerInfo[playerid][pShipment] = 0;
+						PlayerInfo[playerid][pCP] = CHECKPOINT_NONE;
+
+						GivePlayerCash(playerid, petrolv);
+
+						DisablePlayerCheckpoint(playerid);
+					}
+					case 591:
+					{
+						cargo = "Tonnes Of Electronic Items";
+
+						SM(playerid, COLOR_YELLOW, "You Moved %i %s And Earned %i", amount, cargo, elecv);
+
+						PlayerInfo[playerid][pShipment] = 0;
+						PlayerInfo[playerid][pCP] = CHECKPOINT_NONE;
+
+						GivePlayerCash(playerid, elecv);
+
+						DisablePlayerCheckpoint(playerid);
+					}
+					default:
+					{
+						cargo = "Pounds Of PaperWork";
+
+						SM(playerid, COLOR_YELLOW, "You Moved %i %s And Earned %i", amount, cargo, paperv);
+
+						PlayerInfo[playerid][pShipment] = 0;
+						PlayerInfo[playerid][pCP] = CHECKPOINT_NONE;
+
+						GivePlayerCash(playerid, paperv);
+
+						DisablePlayerCheckpoint(playerid);
+					}
+				}
+			}
+			else
+			{
+				cargo = "Pounds Of PaperWork";
+
+				SM(playerid, COLOR_YELLOW, "You Moved %i %s And Earned %i", amount, cargo, paperv);
+
+				PlayerInfo[playerid][pShipment] = 0;
+				PlayerInfo[playerid][pCP] = CHECKPOINT_NONE;
+
+				GivePlayerCash(playerid, paperv);
+
+				DisablePlayerCheckpoint(playerid);
+			}
+
+		}
+	}
+
+	return 1;
+}
+
